@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Text;
 
 namespace WebFramework.Configuration;
-public static class ServiceCollectionExtensions
+public static partial class ServiceCollectionExtensions
 {
     public static void AddJwtAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
     {

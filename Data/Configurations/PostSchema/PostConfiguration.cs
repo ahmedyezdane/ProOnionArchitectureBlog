@@ -13,7 +13,7 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.HasKey(u => u.PostId);
 
         builder.Property(u => u.Title).IsRequired().HasMaxLength(100);
-        builder.Property(u => u.Text).IsRequired();
+        builder.Property(u => u.Text).IsRequired().HasMaxLength(4000);
         builder.Property(u => u.PictureName).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Slug).IsRequired().HasMaxLength(100);
         builder.Property(u => u.CreationDate).IsRequired().HasDefaultValueSql("GetDate()");

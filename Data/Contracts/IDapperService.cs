@@ -3,7 +3,7 @@ using System.Data;
 
 namespace Data.Contracts;
 
-public interface IDapperService : IService
+public interface IDapperService
 {
     Task<int> ExecuteAsync(string query, CancellationToken ct, DynamicParameters parameters = null, CommandType type = CommandType.StoredProcedure);
     Task<IEnumerable<T>> QueryAsync<T>(T outputType,string query, CancellationToken ct, DynamicParameters parameters = null, CommandType type = CommandType.Text);    

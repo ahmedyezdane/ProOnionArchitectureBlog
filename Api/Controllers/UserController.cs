@@ -1,4 +1,5 @@
-﻿using Common.Utilities;
+﻿using Common.Exceptions;
+using Common.Utilities;
 using Core.UserSchema;
 using Data.Contracts.UserSchema;
 using Data.DTOs.UserSchema;
@@ -17,26 +18,44 @@ public class UserController : BaseController
 
     [HttpGet]
     public async Task<IActionResult> GetUsers(CancellationToken ct, int pageId = 1, int take = 20, string userName = "")
-        => Ok(await _userService.GetUserAsync(ct, pageId, take, userName));
+        => Ok(await _userService.GetUsersAsync(ct, pageId, take, userName));
+
+    [HttpGet("{userId:int}")]
+    public async Task<IActionResult> GetUserById(CancellationToken ct, int userId)
+    {
+        if (userId == 0)
+            throw new BadRequestException("Invalid UserId");
+
+        var user = await _userService.GetUserByIdAsync(ct, userId);
+
+
+        return Ok(user);
+    }
 
     [HttpPost("[action]")]
-    public async Task<IActionResult> RegisterUser(RegisterUserDto userDto, CancellationToken ct)
+    public IActionResult RegisterUser(RegisterUserDto userDto)
     {
-        var user = new User()
-        {
-            BirthDate = DateTime.Now,
-            UserId = 0,
-            IsActive = true,
-            Email = userDto.Email,
-            FirstName = userDto.FirstName,
-            Gender = userDto.Gender,
-            LastName = userDto.LastName,
-            PasswordHash = userDto.Password.GetSha256Hash(),
-            UserName = userDto.UserName
-        };
+        // RegisterUserDto converted to User with Implicit Operator in RegisterUserDto
+        _userService.UpdateUser(userDto);
+        return Ok();
+    }
 
-        await _userService.UpdateUserAsync(ct, user);
+    [HttpPut]
+    public IActionResult UpdateUser(UpdateUserDto userDto)
+    {
+        if (userDto.UserId == 0)
+            throw new BadRequestException("Invalid UserId");
 
+        // UpdateUserDto converted to User with Implicit Operator in UpdateUserDto
+        _userService.UpdateUser(userDto);
+
+        return Ok();
+    }
+
+    [HttpDelete("{userId:int}")]
+    public IActionResult DeleteUser(int userId)
+    {
+        _userService.DeleteUser(userId);
         return Ok();
     }
 }

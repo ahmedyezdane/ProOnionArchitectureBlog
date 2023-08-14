@@ -4,14 +4,14 @@ using Data.Contracts.UserSchema;
 using Microsoft.EntityFrameworkCore;
 using Services.DataServices;
 using Services.DataServices.UserSchema;
+using WebFramework.Configuration;
 using WebFramework.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-//builder.Services.AddScoped(typeof(IService), typeof(Service));
-builder.Services.AddScoped(typeof(IUserService),typeof(UserService));
+builder.Services.AddServicesToIoCContainer();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {

@@ -5,7 +5,7 @@ using Data.Contracts;
 using System.Data;
 
 namespace Services.DataServices;
-public class DapperService : Service,IDapperService
+public class DapperService : IDapperService
 {
     private readonly DapperUtility _dapperUtility;
 

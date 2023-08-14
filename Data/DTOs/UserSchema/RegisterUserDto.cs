@@ -52,4 +52,20 @@ public class RegisterUserDto : IValidatableObject
         if(!BirthDate.IsValidDateString())
             yield return new ValidationResult("Invalid BirthDate; please enter a valid date with this format : yyyy-MM-dd", new[] { nameof(UserName) });
     }
+
+    public static implicit operator User(RegisterUserDto userDto)
+    {
+        return new User()
+        {
+            BirthDate = DateTime.Now,
+            UserId = 0,
+            IsActive = true,
+            Email = userDto.Email,
+            FirstName = userDto.FirstName,
+            Gender = userDto.Gender,
+            LastName = userDto.LastName,
+            PasswordHash = userDto.Password.GetSha256Hash(),
+            UserName = userDto.UserName
+        };
+    }
 }

@@ -9,7 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace Services.DataServices.UserSchema;
 
 
-public class UserService : Service, IUserService
+public class UserService : IUserService
 {
     private readonly ApplicationDbContext _context;
 
@@ -18,18 +18,18 @@ public class UserService : Service, IUserService
         _context = context;
     }
 
-    public async Task DeleteUser(CancellationToken ct, int userId)
+    public void DeleteUser(int userId)
     {
-        var user = await _context.Users.FindAsync(userId);
+        var user = _context.Users.Find(userId);
 
         if (user is null)
             throw new BadRequestException("No User found with the given userId");
 
-        _context.Users.Remove(user);
-        await _context.SaveChangesAsync(ct);
+        _context.Remove(user);
+        _context.SaveChanges();
     }
 
-    public async Task<PaginatedResult<User>> GetUserAsync(CancellationToken ct, int pageId = 1, int take = 20, string userName = "")
+    public async Task<PaginatedResult<User>> GetUsersAsync(CancellationToken ct, int pageId = 1, int take = 20, string userName = "")
     {
         var query = _context.Users.AsNoTracking().AsQueryable();
 
@@ -43,14 +43,23 @@ public class UserService : Service, IUserService
         return new PaginatedResult<User>(result, pageId, take,filters);
     }
 
-    public Task<User> GetUserAsync(CancellationToken ct, int userId)
+    public async Task<User> GetUserByIdAsync(CancellationToken ct, int userId)
     {
-        throw new NotImplementedException();
+        var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId,ct);
+
+        if (user is null)
+            throw new NotFoundException("there is no user with the given userId");
+
+        user.PasswordHash = null;
+        return user;
     }
 
-    public async Task UpdateUserAsync(CancellationToken ct, User user)
+    public void UpdateUser(User user)
     {
-        _context.Users.Update(user);
-        await _context.SaveChangesAsync(ct);
+        if(user.UserId != 0 && !_context.Users.Any(u => u.UserId == user.UserId))
+            throw new NotFoundException("there is no user with the given userId");
+
+        _context.Update(user);
+        _context.SaveChanges();
     }
 }
