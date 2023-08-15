@@ -5,18 +5,19 @@ using System.ComponentModel.DataAnnotations;
 namespace Data.DTOs.PostSchema;
 public class InsertPostDto
 {
-    public int PostId { get; set; }
-
     [Display(Name = nameof(Title))]
     [MaxLength(100)]
     [Required]
     public string Title { get; set; }
 
-    [Display(Name = nameof(Title))]
+    [Display(Name = nameof(Text))]
     [MaxLength(4000)]
     [Required]
     public string Text { get; set; }
 
+    [Display(Name = nameof(Slug))]
+    [MaxLength(100)]
+    [Required]
     public string Slug { get; set; }
 
     [Required]

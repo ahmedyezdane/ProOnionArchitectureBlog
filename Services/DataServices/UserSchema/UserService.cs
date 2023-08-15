@@ -34,7 +34,7 @@ public class UserService : IUserService
         var query = _context.Users.AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(userName))
-            query = query.Where(x => x.UserName.ToLower() == userName.ToLower());
+            query = query.Where(x => x.UserName.ToLower().Contains(userName.ToLower()));
 
         var result = await query.Skip((pageId - 1) * take).Take(take).ToListAsync(ct);
 

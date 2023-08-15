@@ -1,5 +1,7 @@
 ﻿using Common.Exceptions;
 using Data.Contracts.PostSchema;
+using Data.DTOs.PostSchema;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers;
@@ -25,31 +27,69 @@ public class PostController : BaseController
 
         var post = await _postService.GetPostByIdAsync(ct, postId);
 
+        if(post is null)
+            throw new NotFoundException("there is no post with the given id");
+
         return Ok(post);
     }
 
-    [HttpPost("[action]")]
-    public IActionResult CreatePost(CreatePostDto postDto)
+    [HttpGet("[action]/{slug}")]
+    public async Task<IActionResult> GetPostBySlug(CancellationToken ct, string slug)
     {
-        _postService.CreatePost(postDto);
+        if (string.IsNullOrWhiteSpace(slug))
+            throw new BadRequestException("slug is required");
+
+        var post = await _postService.GetPostBySlugAsync(ct, slug);
+
+        if (post is null)
+            throw new NotFoundException("there is no post with the given slug");
+
+        return Ok(post);
+    }
+
+    [HttpPost]
+    //[Authorize]
+    public async Task<IActionResult> InsertPost([FromForm] InsertPostDto postDto)
+    {
+        int userId = 1;
+        await _postService.InsertPostAsync(postDto,userId);
         return Ok();
     }
 
     [HttpPut]
-    public IActionResult UpdatePost(UpdatePostDto postDto)
+    //[Authorize]
+    public IActionResult UpdatePost([FromForm] UpdatePostDto postDto)
     {
-        if (postDto.PostId == 0)
-            throw new BadRequestException("Invalid PostId");
-
         _postService.UpdatePost(postDto);
-
         return Ok();
     }
 
     [HttpDelete("{postId:int}")]
+    //[Authorize]
     public IActionResult DeletePost(int postId)
     {
         _postService.DeletePost(postId);
+        return Ok();
+    }
+
+    [HttpGet("comments/{postId:int}")]
+    public async Task<IActionResult> GetPostsOfComment(CancellationToken ct,int postId, int pageId = 1, int take = 20)
+        => Ok(await _postService.GetCommentsOfPostAsync(ct, postId, pageId,take));
+
+    [HttpPost("comments")]
+    //[Authorize]
+    public async Task<IActionResult> InsertComment(InsertCommentDto dto)
+    {
+        int userId = 1;
+        await _postService.InsertCommentAsync(dto, userId);
+        return Ok();
+    }
+
+    [HttpDelete("comments/{commentId:int}")]
+    //[Authorize]
+    public IActionResult DeleteComment(int commentId)
+    {
+        _postService.DeleteComment(commentId);
         return Ok();
     }
 }

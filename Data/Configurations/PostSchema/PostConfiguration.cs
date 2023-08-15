@@ -17,7 +17,7 @@ public class PostConfiguration : IEntityTypeConfiguration<Post>
         builder.Property(u => u.PictureName).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Slug).IsRequired().HasMaxLength(100);
         builder.Property(u => u.CreationDate).IsRequired().HasDefaultValueSql("GetDate()");
-        builder.Property(u => u.IsDeleted).IsRequired().HasDefaultValue(0);
+        builder.Property(u => u.IsDeleted).IsRequired().HasDefaultValue(false);
 
         builder.HasMany(p => p.Comments).WithOne(p => p.Post).HasForeignKey(p => p.PostId);
     }
